@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="index.css">
+    <title>TO-DO List</title>
+</head>
+
+<body>
+    <div class="container">
+        <div class="box">
+            <h2>To Do List</h2>
+            <input type="text" placeholder="write here..." id="inputBX">
+            <ul id="list"></ul>
+        </div>
+    </div>
+    <script>
+        
+
+
+        let inputBX = document.querySelector("#inputBX");
+        let list = document.querySelector("#list");
+
+       
+        document.addEventListener("DOMContentLoaded", function () {
+            loadItems();
+        });
+
+        inputBX.addEventListener("keyup", function (event) {
+            if (event.key === "Enter") {
+                additem(this.value);
+                this.value = "";
+            }
+        });
+
+        let additem = (inputValue) => {
+            if (inputValue.trim() === "") {
+                return;
+            }
+
+            let listitem = document.createElement("li");
+            listitem.textContent = inputValue;
+            listitem.innerHTML += '<i></i>';
+
+            listitem.addEventListener("click", function () {
+                this.classList.toggle('done');
+                updateLocalStorage();
+            });
+
+            listitem.querySelector("i").addEventListener("click", function (event) {
+                event.stopPropagation(); // Prevent the 'click' event from propagating to the parent element
+                updateLocalStorage();
+            });
+
+            list.appendChild(listitem);
+            updateLocalStorage();
+        };
+
+        const updateLocalStorage = () => {
+            let items = [];
+            document.querySelectorAll("#list li").forEach(item => {
+                items.push({
+                    text: item.textContent,
+                    done: item.classList.contains('done')
+                });
+            });
+            localStorage.setItem("items", JSON.stringify(items));
+        };
+
+  
+        const loadItems = () => {
+            let storedItems = localStorage.getItem("items");
+            if (storedItems) {
+                let items = JSON.parse(storedItems);
+                items.forEach(item => {
+                    let listitem = document.createElement("li");
+                    listitem.textContent = item.text;
+                    if (item.done) {
+                        listitem.classList.add('done');
+                    }
+                    listitem.innerHTML += '<i></i>';
+
+                    listitem.addEventListener("click", function () {
+                        this.classList.toggle('done');
+                        updateLocalStorage();
+                    });
+
+                    listitem.querySelector("i").addEventListener("click", function (event) {
+                        event.stopPropagation();
+                        listitem.remove();
+                        updateLocalStorage();
+                    });
+
+                    list.appendChild(listitem);
+                });
+            }
+        };
+
+
+    </script>
+</body>
+
+</html>
